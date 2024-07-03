@@ -17,9 +17,12 @@ local function spawnNPCs()
                 options = {
                     {
                         type = "client",
-                        event = "hospital:client:Revive",
+                        event = "hospital:client:startRevive",
                         icon = "fas fa-heartbeat",
-                        label = "Tedavi Ol"
+                        label = "Tedavi Ol",
+                        action = function(entity)
+                            TriggerEvent("hospital:client:startRevive")
+                        end
                     },
                 },
                 distance = 2.5,
@@ -30,8 +33,8 @@ local function spawnNPCs()
                     name = 'revive_npc',
                     icon = 'fas fa-heartbeat',
                     label = 'Tedavi Ol',
-                    onSelect = function()
-                        TriggerEvent('hospital:client:Revive')
+                    onSelect = function(data)
+                        TriggerEvent('hospital:client:startRevive')
                     end,
                 }
             })
@@ -45,11 +48,20 @@ local function RevivePlayer(playerPed)
     SetEntityCoords(playerPed, GetEntityCoords(playerPed))
 end
 
-RegisterNetEvent('hospital:client:revivePlayer', function()
-    TriggerServerEvent('hospital:server:attemptRevive')
+RegisterNetEvent('hospital:client:startRevive', function()
+    QBCore.Functions.Progressbar("revive_player", "Tedavi Oluyor...", 10000, false, true, {
+        disableMovement = true,
+        disableCarMovement = true,
+        disableMouse = false,
+        disableCombat = true,
+    }, {}, {}, {}, function() -- Done
+        TriggerServerEvent('hospital:server:attemptRevive')
+    end, function() -- Cancel
+        QBCore.Functions.Notify("Tedavi İptal Edildi", "error")
+    end)
 end)
 
-RegisterNetEvent('hospital:client:revivePlayerConfirmed', function()
+RegisterNetEvent('hospital:client:Revive', function()
     local playerPed = PlayerPedId()
     RevivePlayer(playerPed)
 end)
@@ -60,12 +72,12 @@ AddEventHandler('onResourceStart', function(resourceName)
     end
 end)
 
-
+-- Alternatif olarak "onClientMapStart" eventi de kullanılabilir
 AddEventHandler('onClientMapStart', function()
     spawnNPCs()
 end)
 
-
+-- NPC'lerin her zaman invincible olmasını sağlamak için ekstra bir kontrol
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(5000) -- 5 saniyede bir kontrol
