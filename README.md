@@ -37,6 +37,7 @@ Config.NPCs = {
 Config.TargetSystem = "qb-target" -- or "ox-target"
 
 Config.ReviveCost = 500 -- Revive cost in bank money
+```
 
 ----------------------------------------------------------------------------------------
 
