@@ -13,5 +13,6 @@ server_script 'server.lua'
 dependencies {
     'qb-target',
     'ox_target',
-    'qb-menu'
+    'qb-menu',
+    'progressBars'
 }
